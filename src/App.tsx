@@ -4,10 +4,12 @@ import Events from "./pages/Events/Events";
 import Profile from "./pages/Profile/Profile";
 import MainLayout from "./components/Layout/MainLayout";
 import "./App.css"; 
+import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
 
 const App = () => {
   return (
     <MainLayout>
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/events" element={<Events />} />

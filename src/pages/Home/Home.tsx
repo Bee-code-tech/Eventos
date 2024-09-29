@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import RetroGrid from "@/components/ui/retro-grid"; // RetroGrid animation
 import EventList from "@/components/EventList/EventCard";
 import { MarqueeDemo } from "@/components/Marquee/Marquee";
+import UpcomingEvents from "@/components/UpcomingEvent/UpcomingEvents";
 
 const Home = () => {
   return (
@@ -56,6 +57,9 @@ const Home = () => {
         {/* Event List (limited to 3) */}
         <EventList limit={4} />
       </div>
+
+      {/* Upcoming events  */}
+      <UpcomingEvents />
 
       {/* Marquee Section  */}
       <MarqueeDemo />
