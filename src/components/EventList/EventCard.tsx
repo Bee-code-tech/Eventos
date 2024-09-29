@@ -1,19 +1,13 @@
 import React from "react";
 import EventCard from "../EventCard/EventCard";
+import { events } from "../../data"; // Importing the events from data.ts
 
 interface EventListProps {
   limit?: number;
 }
 
 const EventList: React.FC<EventListProps> = ({ limit }) => {
-  // Example event data
-  const events = [
-    { id: 1, name: "Event 1", description: "Description of event 1" },
-    { id: 2, name: "Event 2", description: "Description of event 2" },
-    { id: 3, name: "Event 3", description: "Description of event 3" },
-    { id: 4, name: "Event 4", description: "Description of event 4" },
-  ];
-
+  // Limit the events displayed if the 'limit' prop is passed
   const displayedEvents = limit ? events.slice(0, limit) : events;
 
   return (
