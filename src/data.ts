@@ -1,6 +1,12 @@
 import pic1 from '../src/assets/pic1.jpg'
 import pic2 from '../src/assets/pic2.jpg'
 import pic3 from '../src/assets/pic3.jpg'
+import nft1 from '../src/assets/nft1.JPG'
+import nft2 from '../src/assets/nft2.JPG'
+import nft3 from '../src/assets/nft3.JPG'
+import nft4 from '../src/assets/nft4.JPG'
+import nft5 from '../src/assets/nft5.JPG'
+import nft6 from '../src/assets/nft6.JPG'
 
 export const events = [
   {
@@ -104,3 +110,50 @@ export const events = [
     image:pic3,
   },
 ];
+
+export const nfts = [
+  {
+    id: 1,
+    name: "Claimable NFT #1",
+    image: nft1, // Placeholder image
+    startTimestamp: 1696032000, // Unix timestamp for Sep 30, 2023
+    endTimestamp: 1696291200, // Unix timestamp for Oct 3, 2023 (Already passed, Claimable)
+    price: 0.25,
+  },
+  {
+    id: 2,
+    name: "Claimable NFT #2",
+    image: nft2,
+    startTimestamp: 1695945600, // Unix timestamp for Sep 29, 2023
+    endTimestamp: 1696204800, // Unix timestamp for Oct 2, 2023 (Already passed, Claimable)
+    price: 0.15,
+  },
+  {
+    id: 3,
+    name: "Future NFT #1",
+    image: nft3,
+    startTimestamp: 1698000000, // Unix timestamp for Oct 23, 2023
+    endTimestamp: 1698400000, // Unix timestamp for Oct 28, 2023 (Future event, countdown active)
+    price: 0.35,
+  },
+  {
+    id: 4,
+    name: "Future NFT #2",
+    image: nft4,
+    startTimestamp: 1698500000, // Unix timestamp for Nov 1, 2023
+    endTimestamp: 1699000000, // Unix timestamp for Nov 3, 2023 (Future event, countdown active)
+    price: 0.4,
+  },
+  {
+    id: 5,
+    name: "Future NFT #3",
+    image: nft6,
+    startTimestamp: 1699100000, // Unix timestamp for Nov 4, 2023
+    endTimestamp: 1699200000, // Unix timestamp for Nov 5, 2023 (Future event, countdown active)
+    price: 0.4,
+  },
+];
+
+
+
+
