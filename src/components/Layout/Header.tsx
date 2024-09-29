@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { FaHome, FaCalendarAlt, FaUser, FaGlobe } from "react-icons/fa"; // React Icons
+import { FaHome, FaCalendarAlt, FaUser, FaGlobe, FaBars } from "react-icons/fa"; // Icons
 import classNames from "classnames"; // For conditional classes
+import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet"; // Shadcn UI Sheet
 
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const [isMobileMenuOpen, setMobileMenuOpen] = useState(false); // State for sheet
 
-  // Detect scrolling
+  // Detect scrolling for background change
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 0);
     };
-    
+
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -32,18 +34,37 @@ const Header = () => {
         {/* Logo */}
         <div className="text-2xl font-bold">Eventos</div>
 
-        {/* Navigation Links */}
-        <nav className="flex space-x-6">
+        {/* Desktop Navigation Links (hidden on mobile) */}
+        <nav className="hidden space-x-6 md:flex">
           <NavLink to="/" label="Home" icon={<FaHome />} location={location} />
           <NavLink to="/events" label="Events" icon={<FaCalendarAlt />} location={location} />
           <NavLink to="/profile" label="Profile" icon={<FaUser />} location={location} />
         </nav>
 
-        {/* Connect Wallet Button */}
-        <button className="flex items-center px-4 py-2 text-white transition bg-black rounded-lg shadow-lg hover:bg-gray-800">
-          <FaGlobe className="mr-2" />
-          Connect Wallet
-        </button>
+        {/* Mobile Menu Button and Connect Wallet */}
+        <div className="flex items-center space-x-4">
+          {/* Connect Wallet Button (Full text for desktop, icon-only for mobile) */}
+          <button className="flex items-center px-4 py-2 text-white transition bg-black rounded-lg shadow-lg hover:bg-gray-800">
+            <FaGlobe className="mr-2 md:mr-2" />
+            <span className="hidden md:inline">Connect Wallet</span> {/* Hide text on mobile */}
+          </button>
+
+          {/* Mobile Navigation Menu Trigger (Hamburger Menu) */}
+          <Sheet open={isMobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+            <SheetTrigger asChild>
+              <button className="text-2xl focus:outline-none md:hidden">
+                <FaBars />
+              </button>
+            </SheetTrigger>
+            <SheetContent side="left" className="p-4">
+              <nav className="flex flex-col space-y-4">
+                <NavLink to="/" label="Home" icon={<FaHome />} location={location} />
+                <NavLink to="/events" label="Events" icon={<FaCalendarAlt />} location={location} />
+                <NavLink to="/profile" label="Profile" icon={<FaUser />} location={location} />
+              </nav>
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
     </header>
   );
