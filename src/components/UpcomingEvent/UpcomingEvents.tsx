@@ -13,8 +13,13 @@ const UpcomingEvents: React.FC = () => {
 
       {/* Grid of Events */}
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-        {events.slice(0, 4).map((event) => (
-          <div key={event.id} className="flex flex-col md:flex-row">
+        {events.slice(0, 4).map((event, index) => (
+           <div
+            key={event.id}
+            className="flex flex-col md:flex-row"
+            data-aos="fade-up" // AOS animation: Fade up effect on scroll
+            data-aos-delay={`${index * 200}`} // Delay each card by 200ms
+          >
             {/* Image with Hover Scale Effect */}
             <div className="relative overflow-hidden rounded-lg md:w-1/3">
               <img
