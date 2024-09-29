@@ -5,7 +5,6 @@ import nft1 from '../src/assets/nft1.JPG'
 import nft2 from '../src/assets/nft2.JPG'
 import nft3 from '../src/assets/nft3.JPG'
 import nft4 from '../src/assets/nft4.JPG'
-import nft5 from '../src/assets/nft5.JPG'
 import nft6 from '../src/assets/nft6.JPG'
 
 export const events = [
