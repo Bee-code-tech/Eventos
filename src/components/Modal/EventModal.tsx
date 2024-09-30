@@ -91,7 +91,7 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, addEvent }) =>
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black bg-opacity-50 backdrop-blur-md">
-      <div className="bg-white p-8 rounded-lg w-[500px] lg:max-h-[750px] overflow-y-auto max-h-[680px]">
+      <div className="bg-white py-8 px-4 rounded-lg w-[500px] lg:max-h-[750px] overflow-y-auto max-h-[680px]">
         <h2 className="mb-4 text-2xl font-bold">Create New Event</h2>
         
         {/* Fancy Blockquote */}
