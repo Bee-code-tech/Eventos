@@ -23,7 +23,7 @@ const Header = () => {
   const headerClass = classNames(
     "fixed top-0 left-0 w-full z-50 transition-all",
     {
-      "bg-white shadow-lg backdrop-blur-md": scrolled,
+      "bg-transparent shadow-lg backdrop-blur-lg": scrolled,
       "bg-white": !scrolled,
     }
   );
