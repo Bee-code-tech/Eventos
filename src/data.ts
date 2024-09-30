@@ -1,11 +1,11 @@
-import pic1 from '../src/assets/pic1.jpg'
-import pic2 from '../src/assets/pic2.jpg'
-import pic3 from '../src/assets/pic3.jpg'
-import nft1 from '../src/assets/nft1.JPG';
-import nft2 from '../src/assets/nft2.JPG';
-import nft3 from '../src/assets/nft3.JPG';
-import nft4 from '../src/assets/nft4.JPG';
-import nft6 from '../src/assets/nft6.JPG';
+import pic1 from "../src/assets/pic1.jpg";
+import pic2 from "../src/assets/pic2.jpg";
+import pic3 from "../src/assets/pic3.jpg";
+import nft1 from "../src/assets/nft1.JPG";
+import nft2 from "../src/assets/nft2.JPG";
+import nft3 from "../src/assets/nft3.JPG";
+import nft4 from "../src/assets/nft4.JPG";
+import nft6 from "../src/assets/nft6.JPG";
 
 export const nfts = [
   {
@@ -14,6 +14,7 @@ export const nfts = [
     endTimestamp: "2023-10-03T00:00:00", // Already claimable
     price: 0.25,
     image: nft1,
+    description: "A premier event about blockchain technologies.",
   },
   {
     id: 2,
@@ -21,6 +22,7 @@ export const nfts = [
     endTimestamp: "2024-10-15T00:00:00", // Future event
     price: 0.3,
     image: nft2,
+    description: "A premier event about blockchain technologies.",
   },
   {
     id: 3,
@@ -28,6 +30,7 @@ export const nfts = [
     endTimestamp: "2023-11-03T00:00:00", // Future event
     price: 0.4,
     image: nft3,
+    description: "A premier event about blockchain technologies.",
   },
   {
     id: 4,
@@ -35,6 +38,7 @@ export const nfts = [
     endTimestamp: "2024-12-10T00:00:00", // Future event
     price: 0.35,
     image: nft4,
+    description: "A premier event about blockchain technologies.",
   },
   {
     id: 5,
@@ -42,10 +46,9 @@ export const nfts = [
     endTimestamp: "2024-12-18T00:00:00", // Future event
     price: 0.45,
     image: nft6,
+    description: "A premier event about blockchain technologies.",
   },
 ];
-
-
 
 export const events = [
   {
@@ -56,7 +59,7 @@ export const events = [
     location: "San Francisco, CA",
     price: 0.1,
     category: "Conference",
-    image: pic1, 
+    image: pic1,
   },
   {
     id: 2,
@@ -136,7 +139,7 @@ export const events = [
     location: "Washington, D.C.",
     price: 0.14,
     category: "Summit",
-    image:pic1,
+    image: pic1,
   },
   {
     id: 10,
@@ -146,14 +149,6 @@ export const events = [
     location: "Portland, OR",
     price: 0.13,
     category: "Workshop",
-    image:pic3,
+    image: pic3,
   },
 ];
-
-
-
-
-
-
-
-
