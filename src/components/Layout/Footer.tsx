@@ -2,7 +2,7 @@ import { FaTwitter, FaFacebookF, FaInstagram } from "react-icons/fa"; // Social 
 
 const Footer = () => {
   return (
-    <footer className="grid w-full py-8 text-white bg-slate-800 ">
+    <footer className="grid w-full py-8 text-white bg-black ">
       <div className="container grid justify-center grid-cols-1 gap-8 mx-auto md:grid-cols-3">
         {/* Column 1: Website Name and Copyright */}
         <div className="text-center md:text-left">
@@ -12,7 +12,7 @@ const Footer = () => {
         </div>
 
         {/* Column 2: Navigation Links */}
-        <div className="text-left">
+        <div className="text-center lg:text-left">
           <h3 className="mb-4 text-lg font-semibold">Quick Links</h3>
           <ul>
             <li className="mb-2">
@@ -39,9 +39,9 @@ const Footer = () => {
         </div>
 
         {/* Column 3: Social Media Links */}
-        <div className="text-left md:text-left">
+        <div className="text-center md:text-left">
           <h3 className="mb-4 text-lg font-semibold">Follow Us</h3>
-          <div className="flex justify-start space-x-4 md:justify-start">
+          <div className="flex justify-center space-x-4 md:justify-start">
             <a
               href="#"
               className="text-white transition duration-300 transform hover:text-blue-400 hover:scale-110"

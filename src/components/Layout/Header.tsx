@@ -47,7 +47,7 @@ const Header = () => {
         <div className="flex items-center space-x-4">
           {/* Connect Wallet Button (Full text for desktop, icon-only for mobile) */}
           <button className="flex items-center px-4 py-2 text-white transition bg-black rounded-lg shadow-lg hover:bg-gray-800">
-            <FaGlobe className="mr-2 md:mr-2" />
+            <FaGlobe className=" md:mr-2" />
             <span className="hidden md:inline">Connect Wallet</span> {/* Hide text on mobile */}
           </button>
 
@@ -59,7 +59,9 @@ const Header = () => {
               </button>
             </SheetTrigger>
             <SheetContent side="left" className="p-4">
-              <nav className="flex flex-col space-y-4">
+               
+              <h1 className="mb-12 text-2xl font-bold">Eventos </h1>
+              <nav className="flex flex-col items-center space-y-4">
                 <NavLink to="/" label="Home" icon={<FaHome />} location={location} />
                 <NavLink to="/events" label="Events" icon={<FaCalendarAlt />} location={location} />
                 <NavLink to="/profile" label="Profile" icon={<FaUser />} location={location} />
