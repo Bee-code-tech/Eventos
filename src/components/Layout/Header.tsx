@@ -3,8 +3,13 @@ import { Link, useLocation } from "react-router-dom";
 import { FaHome, FaCalendarAlt, FaUser, FaGlobe, FaBars } from "react-icons/fa"; // Icons
 import classNames from "classnames"; // For conditional classes
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet"; // Shadcn UI Sheet
+import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { useAccount } from "wagmi";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 const Header = () => {
+  const { openConnectModal } = useConnectModal();
+  const { address } = useAccount();
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false); // State for sheet
@@ -32,24 +37,42 @@ const Header = () => {
     <header className={headerClass}>
       <div className="container flex items-center justify-between p-4 mx-auto">
         {/* Logo */}
-       <Link to='/'>
-        <div className="text-2xl font-bold">Eventos</div>
-       </Link>
+        <Link to="/">
+          <div className="text-2xl font-bold">Eventos</div>
+        </Link>
 
         {/* Desktop Navigation Links (hidden on mobile) */}
         <nav className="hidden space-x-6 md:flex">
           <NavLink to="/" label="Home" icon={<FaHome />} location={location} />
-          <NavLink to="/events" label="Events" icon={<FaCalendarAlt />} location={location} />
-          <NavLink to="/profile" label="Profile" icon={<FaUser />} location={location} />
+          <NavLink
+            to="/events"
+            label="Events"
+            icon={<FaCalendarAlt />}
+            location={location}
+          />
+          <NavLink
+            to="/profile"
+            label="Profile"
+            icon={<FaUser />}
+            location={location}
+          />
         </nav>
 
         {/* Mobile Menu Button and Connect Wallet */}
         <div className="flex items-center space-x-4">
           {/* Connect Wallet Button (Full text for desktop, icon-only for mobile) */}
-          <button className="flex items-center px-4 py-2 text-white transition bg-black rounded-lg shadow-lg hover:bg-gray-800">
-            <FaGlobe className=" md:mr-2" />
-            <span className="hidden md:inline">Connect Wallet</span> {/* Hide text on mobile */}
-          </button>
+          {address ? (
+            <ConnectButton />
+          ) : (
+            <button
+              onClick={openConnectModal}
+              className="flex items-center px-4 py-2 text-white transition bg-black rounded-lg shadow-lg hover:bg-gray-800"
+            >
+              <FaGlobe className=" md:mr-2" />
+              <span className="hidden md:inline">Connect Wallet</span>{" "}
+              {/* Hide text on mobile */}
+            </button>
+          )}
 
           {/* Mobile Navigation Menu Trigger (Hamburger Menu) */}
           <Sheet open={isMobileMenuOpen} onOpenChange={setMobileMenuOpen}>
@@ -59,12 +82,26 @@ const Header = () => {
               </button>
             </SheetTrigger>
             <SheetContent side="left" className="p-4">
-               
               <h1 className="mb-12 text-2xl font-bold">Eventos </h1>
               <nav className="flex flex-col items-center space-y-4">
-                <NavLink to="/" label="Home" icon={<FaHome />} location={location} />
-                <NavLink to="/events" label="Events" icon={<FaCalendarAlt />} location={location} />
-                <NavLink to="/profile" label="Profile" icon={<FaUser />} location={location} />
+                <NavLink
+                  to="/"
+                  label="Home"
+                  icon={<FaHome />}
+                  location={location}
+                />
+                <NavLink
+                  to="/events"
+                  label="Events"
+                  icon={<FaCalendarAlt />}
+                  location={location}
+                />
+                <NavLink
+                  to="/profile"
+                  label="Profile"
+                  icon={<FaUser />}
+                  location={location}
+                />
               </nav>
             </SheetContent>
           </Sheet>
