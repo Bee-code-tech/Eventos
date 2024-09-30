@@ -55,7 +55,7 @@ const Home = () => {
         </div>
 
         {/* Event List (limited to 3) */}
-        <EventList limit={4} />
+        <EventList limit={4} edit={false} />
       </div>
 
       {/* Upcoming events  */}

@@ -5,6 +5,7 @@ import ClaimNFTTab from "./ClaimNFTTab";
 import toast, { Toaster } from "react-hot-toast"; // React Hot Toast for notifications
 import { FaCopy } from "react-icons/fa"; // Copy icon from react-icons
 import EventList from "@/components/EventList/EventCard";
+import MyEventsTab from "./MyEventsTab";
 
 const Profile = () => {
   const [activeTab, setActiveTab] = useState<"all" | "myEvents" | "claimNFT">("all");
@@ -29,7 +30,7 @@ const Profile = () => {
       case "all":
         return <EventList grid={3} />;
       case "myEvents":
-        return <EventList grid={3} />;
+        return <MyEventsTab />;
       case "claimNFT":
         return <ClaimNFTTab />;
       default:

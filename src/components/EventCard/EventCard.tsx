@@ -1,7 +1,5 @@
 import React from "react";
-import { FaCalendarAlt, FaMapMarkerAlt } from "react-icons/fa"; // Calendar and Location Icons
-import { FaEthereum } from "react-icons/fa6";
-
+import { FaCalendarAlt, FaMapMarkerAlt, FaEthereum, FaTrashAlt } from "react-icons/fa"; // Calendar, Location, Edit, and Delete Icons
 
 interface EventCardProps {
   event: {
@@ -14,9 +12,12 @@ interface EventCardProps {
     category: string;
     image: string;
   };
+  isEditable: boolean; // Add the isEditable prop to control the button rendering
+  onEdit?: (id: number) => void; // Optional Edit function callback
+  onDelete?: (id: number) => void; // Optional Delete function callback
 }
 
-const EventCard: React.FC<EventCardProps> = ({ event }) => {
+const EventCard: React.FC<EventCardProps> = ({ event, isEditable, onDelete }) => {
   return (
     <div className="overflow-hidden border rounded-lg shadow-lg">
       {/* Image Section */}
@@ -49,20 +50,34 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
           <span>{event.location}</span>
         </div>
 
-        {/* Footer: Registration and Price */}
-        <div className="flex items-center justify-between">
-          {/* Register Button */}
-          <button className="px-4 py-2 text-white rounded-lg bg-slate-600 hover:bg-slate-700">
-            Register
-          </button>
+        {/* Conditional Button Rendering */}
+        {!isEditable ? (
+          <div className="flex items-center justify-between">
+            {/* Register Button */}
+            <button className="px-4 py-2 text-white rounded-lg bg-slate-600 hover:bg-slate-700">
+              Register
+            </button>
 
-          {/* Price */}
-          <div className="flex items-center">
-            <FaEthereum className="mr-1" />
-            <span className="font-bold">{event.price} ARB</span>
-            <span className="ml-2 text-sm text-gray-500">($25.00)</span>
+            {/* Price */}
+            <div className="flex items-center">
+              <FaEthereum className="mr-1" />
+              <span className="font-bold">{event.price} ARB</span>
+              <span className="ml-2 text-sm text-gray-500">($25.00)</span>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="flex items-center justify-between w-full">
+          
+            {/* Delete Button */}
+            <button
+              onClick={() => onDelete && onDelete(event.id)} // Call the onDelete callback if provided
+              className="w-full px-4 py-2 text-white bg-red-500 rounded-lg hover:bg-red-600"
+            >
+              <FaTrashAlt className="inline-block mr-2" />
+              Delete
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
