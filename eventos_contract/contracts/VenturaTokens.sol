@@ -7,12 +7,11 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import {VenturaErrors} from "./VenturaErrors.sol";
 
 contract VenturaTokens is ERC1155, Ownable {
-
     uint256 public constant VENTURA = 0;
     uint256 public constant CREATOR_NFT_ID = 1;
-    uint256 public constant  POAT_NFT_ID = 2;
-    
+    uint256 public constant POAT_NFT_ID = 2;
 
+    uint256 public counter = 0;
     uint8 public constant TOKEN_LIMIT = 1;
 
     string[] public nft_metadata;
@@ -24,41 +23,45 @@ contract VenturaTokens is ERC1155, Ownable {
     }
 
     function _setURIS() private {
-
         nft_metadata.push(
             "https://ipfs.io/ipfs/QmfThmmntg4dKSa8EHmbRQWUkt36fzCK54EV3BeT4Ks7hE/ventura.json"
         );
-        tokenURI[1] = "https://ipfs.io/ipfs/QmfThmmntg4dKSa8EHmbRQWUkt36fzCK54EV3BeT4Ks7hE/ventura.json";
+        tokenURI[
+            1
+        ] = "https://ipfs.io/ipfs/QmfThmmntg4dKSa8EHmbRQWUkt36fzCK54EV3BeT4Ks7hE/ventura.json";
 
         nft_metadata.push(
             "https://ipfs.io/ipfs/QmfThmmntg4dKSa8EHmbRQWUkt36fzCK54EV3BeT4Ks7hE/creator.json"
         );
 
-        tokenURI[2] = "https://ipfs.io/ipfs/QmfThmmntg4dKSa8EHmbRQWUkt36fzCK54EV3BeT4Ks7hE/creator.json";
+        tokenURI[
+            2
+        ] = "https://ipfs.io/ipfs/QmfThmmntg4dKSa8EHmbRQWUkt36fzCK54EV3BeT4Ks7hE/creator.json";
 
         nft_metadata.push(
             "https://ipfs.io/ipfs/QmfThmmntg4dKSa8EHmbRQWUkt36fzCK54EV3BeT4Ks7hE/poap.json"
         );
 
-        tokenURI[3] =  "https://ipfs.io/ipfs/QmfThmmntg4dKSa8EHmbRQWUkt36fzCK54EV3BeT4Ks7hE/poap.json";
+        tokenURI[
+            3
+        ] = "https://ipfs.io/ipfs/QmfThmmntg4dKSa8EHmbRQWUkt36fzCK54EV3BeT4Ks7hE/poap.json";
     }
 
-    function mint(address to, uint256 id, uint256 value, bytes memory data) external {
-        super._mint(to, id, value, data);
+    function mint(address to, uint256 value, bytes memory data) external {
+        super._mint(to, counter, value, data);
+        counter++;
     }
 
-    
     function contractURI() public pure returns (string memory) {
         return
             "https://ipfs.io/ipfs/QmfThmmntg4dKSa8EHmbRQWUkt36fzCK54EV3BeT4Ks7hE/ventura.json";
     }
 
-    function getIDSpace() private view returns(uint256) {
+    function getIDSpace() private view returns (uint256) {
         return nft_metadata.length;
     }
 
     function _insetURI(string memory _uri) internal {
-
         uint256 _id = getIDSpace() + 1;
 
         tokenURI[_id] = _uri;
@@ -66,7 +69,7 @@ contract VenturaTokens is ERC1155, Ownable {
         emit URI(_uri, _id);
     }
 
-    function setURI( string memory _uri) external onlyOwner {
+    function setURI(string memory _uri) external onlyOwner {
         _insetURI(_uri);
     }
 
@@ -76,7 +79,7 @@ contract VenturaTokens is ERC1155, Ownable {
     }
 
     // function mintNFT(address recipient, uint256 nftId) external onlyOwner {
-        
+
     //      _mint(recipient, nftId, TOKEN_LIMIT, "");
     // }
 
