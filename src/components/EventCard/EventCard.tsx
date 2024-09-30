@@ -1,5 +1,8 @@
 import React from "react";
-import { FaCalendarAlt, FaMapMarkerAlt, FaEthereum, FaTrashAlt } from "react-icons/fa"; // Calendar, Location, Edit, and Delete Icons
+import { FaCalendarAlt, FaMapMarkerAlt, FaEthereum, FaTrashAlt } from "react-icons/fa";
+import { useAccount } from "wagmi"; 
+import { useConnectModal } from "@rainbow-me/rainbowkit"; 
+import toast from "react-hot-toast"; // Import toast from react-hot-toast
 
 interface EventCardProps {
   event: {
@@ -12,12 +15,25 @@ interface EventCardProps {
     category: string;
     image: string;
   };
-  isEditable: boolean; // Add the isEditable prop to control the button rendering
-  onEdit?: (id: number) => void; // Optional Edit function callback
-  onDelete?: (id: number) => void; // Optional Delete function callback
+  isEditable: boolean;
+  onDelete?: (id: number) => void;
 }
 
 const EventCard: React.FC<EventCardProps> = ({ event, isEditable, onDelete }) => {
+  const { address } = useAccount(); // Get the connected wallet address
+  const { openConnectModal } = useConnectModal(); 
+
+  // Function to handle Register button click
+  const handleRegister = () => {
+    if (!address) {
+      openConnectModal?.(); // Open connect wallet modal if no wallet is connected
+    } else {
+      // Simulate registration and show a toast notification
+      toast.success(`You have successfully registered for ${event.name}!`);
+      console.log("User registered for the event:", event.id);
+    }
+  };
+
   return (
     <div className="overflow-hidden border rounded-lg shadow-lg">
       {/* Image Section */}
@@ -54,7 +70,10 @@ const EventCard: React.FC<EventCardProps> = ({ event, isEditable, onDelete }) =>
         {!isEditable ? (
           <div className="flex items-center justify-between">
             {/* Register Button */}
-            <button className="px-4 py-2 text-white rounded-lg bg-slate-600 hover:bg-slate-700">
+            <button
+              onClick={handleRegister} // Handle register click
+              className="px-4 py-2 text-white transition duration-300 rounded-lg bg-slate-600 hover:bg-slate-700 hover:scale-x-110"
+            >
               Register
             </button>
 
@@ -67,7 +86,6 @@ const EventCard: React.FC<EventCardProps> = ({ event, isEditable, onDelete }) =>
           </div>
         ) : (
           <div className="flex items-center justify-between w-full">
-          
             {/* Delete Button */}
             <button
               onClick={() => onDelete && onDelete(event.id)} // Call the onDelete callback if provided

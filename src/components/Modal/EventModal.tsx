@@ -1,8 +1,43 @@
 import React, { useState } from 'react';
 import { FaTrash, FaBuilding, FaUpload, FaSpinner } from 'react-icons/fa6';
-import { uploadToPinata } from '../../utils/uploadToPinanta';
 import { FaInfoCircle } from 'react-icons/fa';
+import { CalendarIcon } from "@radix-ui/react-icons";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { uploadToPinata } from '@/utils/uploadToPinanta';
 
+// DatePicker component for the Event Date
+export function DatePicker({ selectedDate, onDateChange }: { selectedDate: Date | undefined, onDateChange: (date: Date | undefined) => void }) {
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          variant={"outline"}
+          className={cn(
+            "w-full justify-start text-left font-normal",
+            !selectedDate && "text-muted-foreground"
+          )}
+        >
+          <CalendarIcon className="w-4 h-4 mr-2" />
+          {selectedDate ? format(selectedDate, "PPP") : <span>Pick an event end date</span>}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0" align="start">
+        <Calendar
+          mode="single"
+          selected={selectedDate}
+          onSelect={onDateChange}
+          initialFocus
+        />
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+// EventModal Component
 interface EventModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -13,60 +48,83 @@ interface Event {
   id: number;
   title: string;
   image: string;
-  nftImage: string;
   description: string;
   startTime: string;
   endTime: string;
   venue: string;
   price: string;
+  eventDate: string;
 }
 
 const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, addEvent }) => {
   const [title, setTitle] = useState('');
   const [image, setImage] = useState('');
-  const [nftImage, setNftImage] = useState('');
-  const [startTime, setStartTime] = useState('');
   const [description, setDescription] = useState('');
-  const [endTime, setEndTime] = useState('');
   const [price, setPrice] = useState('');
   const [venue, setVenue] = useState('');
+  const [eventEndDate, setEventEndDate] = useState<Date | undefined>(undefined);
+  
+  // Time inputs
+  const [startTime, setStartTime] = useState('');
+  const [startAmPm, setStartAmPm] = useState('AM');
+  const [endTime, setEndTime] = useState('');
+  const [endAmPm, setEndAmPm] = useState('AM');
 
-  // Loading states for image uploads
+  // Loading state for image upload
   const [eventImageLoading, setEventImageLoading] = useState(false);
-  const [nftImageLoading, setNftImageLoading] = useState(false);
 
-  const handleFileUpload = async (file: File, type: 'event' | 'nft') => {
-    const setLoadingState = type === 'event' ? setEventImageLoading : setNftImageLoading;
-    const setUrlState = type === 'event' ? setImage : setNftImage;
-
-    setLoadingState(true); // Show spinner
+  const handleFileUpload = async (file: File) => {
+    setEventImageLoading(true); // Show spinner
     try {
       const url = await uploadToPinata(file);
       if (url) {
-        setUrlState(url); // Store the uploaded URL
+        setImage(url); // Store the uploaded URL
       }
     } catch (error) {
       console.error('Upload failed:', error);
     } finally {
-      setLoadingState(false); // Hide spinner
+      setEventImageLoading(false); // Hide spinner
     }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Create the new event object
+    if (!eventEndDate) {
+      console.error("Event end date is required");
+      return;
+    }
+
+    // Convert the eventEndDate and start/end times into full DateTime strings
+    const fullStartTime = new Date(`${format(eventEndDate, 'yyyy-MM-dd')} ${startTime} ${startAmPm}`);
+    const fullEndTime = new Date(`${format(eventEndDate, 'yyyy-MM-dd')} ${endTime} ${endAmPm}`);
+
+    // Convert to Unix timestamps (seconds)
+    const startUnix = Math.floor(fullStartTime.getTime() / 1000); // Start time in Unix timestamp
+    const endUnix = Math.floor(fullEndTime.getTime() / 1000); // End time in Unix timestamp
+
+    // Convert eventEndDate to Unix timestamp (just the date, no time)
+    const eventDateUnix = Math.floor(eventEndDate.getTime() / 1000); // Event date in Unix timestamp
+
+    // Create newEvent object with Unix timestamps for startTime, endTime, and eventEndDate
     const newEvent: Event = {
-      id: Date.now(), // Unique id
+      id: Date.now(),
       title,
       image, // Event image URL
-      nftImage, // NFT image URL
       description,
-      startTime,
-      endTime,
+      startTime: startUnix.toString(), // Store Unix timestamp as string for smart contract
+      endTime: endUnix.toString(), // Store Unix timestamp as string for smart contract
       venue,
       price,
+      eventDate: eventDateUnix.toString(), // Include event end date as Unix timestamp
     };
+
+    // Log values
+    console.log('Form values:', newEvent);
+    console.log('Event End Date:', eventEndDate); // Log the selected event end date
+    console.log('Event Date Unix Timestamp:', eventDateUnix); // Log the Unix timestamp for the event end date
+    console.log('Start Unix Timestamp:', startUnix); // Log the Unix timestamp for start time
+    console.log('End Unix Timestamp:', endUnix); // Log the Unix timestamp for end time
 
     // Add the event to the list
     addEvent(newEvent);
@@ -79,35 +137,31 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, addEvent }) =>
   const resetForm = () => {
     setTitle('');
     setImage('');
-    setNftImage('');
-    setStartTime('');
     setDescription('');
-    setEndTime('');
     setPrice('');
     setVenue('');
+    setEventEndDate(undefined);
+    setStartTime('');
+    setEndTime('');
   };
 
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black bg-opacity-50 backdrop-blur-md">
-      <div className="bg-white py-8 px-4 rounded-lg w-[500px] lg:max-h-[750px] overflow-y-auto max-h-[680px]">
+      <div className="bg-white py-8 px-4 rounded-lg w-[500px] lg:max-h-[800px] overflow-y-auto max-h-[680px]">
         <h2 className="mb-4 text-2xl font-bold">Create New Event</h2>
         
-        {/* Fancy Blockquote */}
         <blockquote className="flex items-start p-4 mb-6 bg-green-100 rounded-lg">
           <FaInfoCircle className="mr-3 text-2xl text-green-500" />
           <span className="text-sm text-green-800">
-            Please upload both event and NFT images. The NFT image will be minted for all attendees.
+            Please upload an event image.
           </span>
         </blockquote>
 
         <form onSubmit={handleSubmit}>
-         
-
-          {/* Upload Boxes - Side by Side */}
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            {/* Event Image Upload */}
+          {/* Upload Event Image */}
+          <div className="grid grid-cols-1 gap-4 mb-4">
             <div className="relative flex items-center justify-center w-full h-48 border-2 border-dashed rounded-lg">
               {!image ? (
                 <label className="flex flex-col items-center justify-center cursor-pointer">
@@ -124,7 +178,7 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, addEvent }) =>
                     className="hidden"
                     onChange={(e) => {
                       if (e.target.files && e.target.files[0]) {
-                        handleFileUpload(e.target.files[0], 'event');
+                        handleFileUpload(e.target.files[0]);
                       }
                     }}
                     required
@@ -133,38 +187,11 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, addEvent }) =>
               ) : (
                 <img src={image} alt="Event" className="absolute object-cover w-full h-full rounded-lg" />
               )}
-            </div>
-
-            {/* NFT Image Upload */}
-            <div className="relative flex items-center justify-center w-full h-48 border-2 border-dashed rounded-lg">
-              {!nftImage ? (
-                <label className="flex flex-col items-center justify-center cursor-pointer">
-                  {nftImageLoading ? (
-                    <FaSpinner className="text-4xl text-gray-400 animate-spin" />
-                  ) : (
-                    <>
-                      <FaUpload className="text-4xl text-gray-400" />
-                      <span className="mt-2 text-sm">Upload NFT Image</span>
-                    </>
-                  )}
-                  <input
-                    type="file"
-                    className="hidden"
-                    onChange={(e) => {
-                      if (e.target.files && e.target.files[0]) {
-                        handleFileUpload(e.target.files[0], 'nft');
-                      }
-                    }}
-                    required
-                  />
-                </label>
-              ) : (
-                <img src={nftImage} alt="NFT" className="absolute object-cover w-full h-full rounded-lg" />
-              )}
-            </div>
+            </div>    
           </div>
 
-           <div className="mb-4">
+          {/* Title */}
+          <div className="mb-4">
             <label className="block mb-1 text-sm">Title</label>
             <input
               type="text"
@@ -175,6 +202,7 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, addEvent }) =>
             />
           </div>
 
+          {/* Description */}
           <div className="mb-4">
             <label className="block mb-1 text-sm">Short Description</label>
             <input
@@ -186,28 +214,7 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, addEvent }) =>
             />
           </div>
 
-          <div className="mb-4">
-            <label className="block mb-1 text-sm">Start Time</label>
-            <input
-              type="datetime-local"
-              value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
-              className="w-full px-2 py-1 border rounded"
-              required
-            />
-          </div>
-
-          <div className="mb-4">
-            <label className="block mb-1 text-sm">End Time</label>
-            <input
-              type="datetime-local"
-              value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
-              className="w-full px-2 py-1 border rounded"
-              required
-            />
-          </div>
-
+          {/* Price */}
           <div className="mb-4">
             <label className="block mb-1 text-sm">Price</label>
             <input
@@ -219,6 +226,7 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, addEvent }) =>
             />
           </div>
 
+          {/* Venue */}
           <div className="mb-4">
             <label className="block mb-1 text-sm">Venue</label>
             <input
@@ -230,6 +238,58 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, addEvent }) =>
             />
           </div>
 
+          {/* Date Picker */}
+          <div className="mb-4">
+            <label className="block mb-1 text-sm">Event End Date</label>
+            <DatePicker selectedDate={eventEndDate} onDateChange={setEventEndDate} />
+          </div>
+
+          {/* Time Inputs */}
+          <div className="mb-4">
+            <label className="block mb-1 text-sm">Start Time</label>
+            <div className="flex space-x-2">
+              <input
+                type="text"
+                value={startTime}
+                onChange={(e) => setStartTime(e.target.value)}
+                placeholder="4:30"
+                className="w-2/3 px-2 py-1 border rounded"
+                required
+              />
+              <select
+                value={startAmPm}
+                onChange={(e) => setStartAmPm(e.target.value)}
+                className="w-1/3 px-2 py-1 border rounded"
+              >
+                <option value="AM">AM</option>
+                <option value="PM">PM</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="mb-4">
+            <label className="block mb-1 text-sm">End Time</label>
+            <div className="flex space-x-2">
+              <input
+                type="text"
+                value={endTime}
+                onChange={(e) => setEndTime(e.target.value)}
+                placeholder="10:00"
+                className="w-2/3 px-2 py-1 border rounded"
+                required
+              />
+              <select
+                value={endAmPm}
+                onChange={(e) => setEndAmPm(e.target.value)}
+                className="w-1/3 px-2 py-1 border rounded"
+              >
+                <option value="AM">AM</option>
+                <option value="PM">PM</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Submit Buttons */}
           <div className="flex justify-between mt-8">
             <div
               onClick={onClose}
