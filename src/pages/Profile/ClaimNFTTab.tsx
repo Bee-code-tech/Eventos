@@ -134,7 +134,7 @@ const NFTCard: React.FC<{ nft: NFT }> = ({ nft }) => {
       <div className="flex items-center justify-between w-full p-4 mt-auto ">
         <div className="flex items-center justify-between w-full ">
           <button
-            className={`px-4 py-2 text-white rounded-lg w-[70%] ${
+            className={`px-4 py-2 text-white rounded-lg w-[50%] ${
               isClaimable ? "bg-slate-600 hover:bg-slate-700" : "bg-gray-400 cursor-not-allowed"
             }`}
             disabled={!isClaimable}
