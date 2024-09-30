@@ -60,10 +60,10 @@ const Profile = () => {
           <h1 className="mb-4 text-2xl font-bold">Dashboard</h1>
 
           {/* Tabs */}
-          <div className="flex space-x-4 border-b">
+          <div className="flex space-x-10 border-b">
             <button
               className={`pb-2 text-lg ${
-                activeTab === "all" ? "border-b-2 border-blue-500" : "text-gray-500"
+                activeTab === "all" ? "border-b-2 border-slate-500" : "text-gray-500"
               }`}
               onClick={() => setActiveTab("all")}
             >
@@ -71,7 +71,7 @@ const Profile = () => {
             </button>
             <button
               className={`pb-2 text-lg ${
-                activeTab === "myEvents" ? "border-b-2 border-blue-500" : "text-gray-500"
+                activeTab === "myEvents" ? "border-b-2 border-slate-500" : "text-gray-500"
               }`}
               onClick={() => setActiveTab("myEvents")}
             >
@@ -79,7 +79,7 @@ const Profile = () => {
             </button>
             <button
               className={`pb-2 text-lg ${
-                activeTab === "claimNFT" ? "border-b-2 border-blue-500" : "text-gray-500"
+                activeTab === "claimNFT" ? "border-b-2 border-slate-500" : "text-gray-500"
               }`}
               onClick={() => setActiveTab("claimNFT")}
             >

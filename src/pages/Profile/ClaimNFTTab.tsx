@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { FaEthereum } from "react-icons/fa6"; // Ethereum icon
-import { nfts } from "../../data"; // Import NFT data from data.ts
+import { FaEthereum } from "react-icons/fa6"; // Import Ethereum and success icons
+import { nfts } from "@/data"; // Import NFT data
+import { HiOutlineCursorClick } from "react-icons/hi";
 
 // Define the structure of the timeLeft object
 interface TimeLeft {
@@ -15,19 +16,21 @@ interface NFT {
   id: number;
   name: string;
   image: string;
-  startTimestamp: number | null; // Unix timestamp for when NFT minting starts
-  endTimestamp: number | null; // Unix timestamp for when NFT minting ends (claimable after this)
+  endTimestamp: string; // Use JavaScript date string for the end timestamp
   price: number;
 }
 
 // Helper function to calculate time remaining for the end of the event (claimable time)
-const calculateTimeLeft = (endTimestamp: number | null): TimeLeft | null => {
-  if (!endTimestamp) return null; // If endTimestamp is null, return null
+const calculateTimeLeft = (endTimestamp: string): TimeLeft | null => {
+  const now = Date.now(); // Get the current time in milliseconds
+  const end = new Date(endTimestamp).getTime(); // Convert the end date to milliseconds
 
-  const now = +new Date(); // Current time in milliseconds
-  const difference = endTimestamp * 1000 - now; // Convert Unix to ms
+  const difference = end - now; // Difference in milliseconds
 
-  if (difference <= 0) return null; // If time is up, return null
+  // If the end date is in the past, return null (nothing to display)
+  if (difference <= 0) {
+    return null;
+  }
 
   return {
     days: Math.floor(difference / (1000 * 60 * 60 * 24)),
@@ -37,34 +40,39 @@ const calculateTimeLeft = (endTimestamp: number | null): TimeLeft | null => {
   };
 };
 
-// Individual NFT Card Component
 const NFTCard: React.FC<{ nft: NFT }> = ({ nft }) => {
   const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(calculateTimeLeft(nft.endTimestamp));
   const [isClaimable, setIsClaimable] = useState(false);
 
-
-
   useEffect(() => {
-    if (nft.endTimestamp) {
-      const timer = setInterval(() => {
-        const updatedTimeLeft = calculateTimeLeft(nft.endTimestamp);
-        setTimeLeft(updatedTimeLeft);
+    const checkClaimableStatus = () => {
+      const now = Date.now();
+      const end = new Date(nft.endTimestamp).getTime();
 
-        // Check if the current time has passed the endTimestamp (event passed)
-        if (nft.endTimestamp && nft.endTimestamp * 1000 <= +new Date()) {
-          setIsClaimable(true); // Claimable after the event has passed
-        }
-      }, 1000);
+      // Check if the current time is past the endTimestamp
+      if (now >= end) {
+        setIsClaimable(true); // Event has passed, NFT is claimable
+      } else {
+        setIsClaimable(false); // Event not over, countdown is still active
+      }
+    };
 
-      return () => clearInterval(timer); // Cleanup interval on unmount
-    } else {
-      setIsClaimable(true); // If no end timestamp, make claimable immediately
-    }
+    checkClaimableStatus(); // Check claimable status immediately
+
+    // Set up an interval to update the timeLeft every second
+    const timer = setInterval(() => {
+      const updatedTimeLeft = calculateTimeLeft(nft.endTimestamp);
+      setTimeLeft(updatedTimeLeft);
+
+      checkClaimableStatus(); // Update claimable status based on the time
+    }, 1000);
+
+    return () => clearInterval(timer); // Cleanup interval on unmount
   }, [nft.endTimestamp]);
 
   return (
     <div
-      className="overflow-hidden border rounded-lg shadow-lg"
+      className="flex flex-col overflow-hidden border rounded-lg shadow-lg"
       data-aos="fade-up" // AOS animation attribute
       data-aos-delay={nft.id * 100} // Delay animation based on the index of the NFT
     >
@@ -82,52 +90,60 @@ const NFTCard: React.FC<{ nft: NFT }> = ({ nft }) => {
       </div>
 
       {/* NFT Details */}
-      <div className="p-4">
+      <div className="flex-grow p-4">
         <h2 className="mb-2 text-xl font-bold">{nft.name}</h2>
 
         {/* Countdown Timer (if not yet claimable) */}
-        {nft.startTimestamp && nft.endTimestamp && !isClaimable && timeLeft && (
-          <div className="grid grid-cols-4 gap-2 mb-4 text-center">
-            <div>
-              <div className="p-2 bg-gray-200 rounded-lg">
-                <p className="text-lg font-bold">{timeLeft.days}</p>
-                <p className="text-xs">Days</p>
-              </div>
+        {!isClaimable && timeLeft && (
+          <div className="flex justify-center h-auto mt-6 space-x-2 text-black">
+            <div className="flex flex-col items-center justify-center overflow-hidden text-xs font-bold rounded-lg bg-slate-100">
+              <span className="px-4 py-2">{timeLeft.days}</span>
+              <span className="text-[10px] bg-black w-full flex items-center justify-center text-white px-4">days</span>
             </div>
-            <div>
-              <div className="p-2 bg-gray-200 rounded-lg">
-                <p className="text-lg font-bold">{timeLeft.hours}</p>
-                <p className="text-xs">Hours</p>
-              </div>
+            <span className="mt-3 text-black">:</span>
+            <div className="flex flex-col items-center justify-center overflow-hidden text-xs font-bold rounded-lg bg-slate-100">
+              <span className="px-4 py-2">{timeLeft.hours}</span>
+              <span className="text-[10px] bg-black w-full flex items-center justify-center text-white px-4">hrs</span>
             </div>
-            <div>
-              <div className="p-2 bg-gray-200 rounded-lg">
-                <p className="text-lg font-bold">{timeLeft.minutes}</p>
-                <p className="text-xs">Minutes</p>
-              </div>
+            <span className="mt-3 text-black">:</span>
+            <div className="flex flex-col items-center justify-center overflow-hidden text-xs font-bold rounded-lg bg-slate-100">
+              <span className="px-4 py-2">{timeLeft.minutes}</span>
+              <span className="text-[10px] bg-black w-full flex items-center justify-center text-white px-4">mins</span>
             </div>
-            <div>
-              <div className="p-2 bg-gray-200 rounded-lg">
-                <p className="text-lg font-bold">{timeLeft.seconds}</p>
-                <p className="text-xs">Seconds</p>
-              </div>
+            <span className="mt-3 text-black">:</span>
+            <div className="flex flex-col items-center justify-center overflow-hidden text-xs font-bold rounded-lg bg-slate-100">
+              <span className="px-4 py-2">{timeLeft.seconds}</span>
+              <span className="text-[10px] bg-black w-full flex items-center justify-center text-white px-4">secs</span>
             </div>
           </div>
         )}
 
-        {/* Claim Button */}
-        <div className="flex items-center justify-between">
+        {/* Success Message when NFT is claimable */}
+       {isClaimable && (
+  <blockquote className="p-4 mt-4 text-sm text-green-700 bg-green-200 border-l-4 border-green-400 rounded-lg">
+    <div className="flex items-center">
+      <HiOutlineCursorClick className="mr-2 text-2xl" />
+      <span className="italic">You can now claim your NFT!</span>
+    </div>
+  </blockquote>
+)}
+
+      </div>
+
+      {/* Claim Button and Price at the bottom */}
+      <div className="flex items-center justify-between w-full p-4 mt-auto ">
+        <div className="flex items-center justify-between w-full ">
           <button
-            className={`px-4 py-2 text-white rounded-lg ${
+            className={`px-4 py-2 text-white rounded-lg w-[70%] ${
               isClaimable ? "bg-slate-600 hover:bg-slate-700" : "bg-gray-400 cursor-not-allowed"
             }`}
             disabled={!isClaimable}
           >
-            {isClaimable ? "Claim NFT" : "Claim NFT (Locked)"}
+            {isClaimable ? "Claim NFT" : "Locked"}
           </button>
 
           {/* Price in Ethereum */}
-          <div className="flex items-center">
+          <div className="flex items-center ">
             <FaEthereum className="mr-1" />
             <span className="font-bold">{nft.price} ETH</span>
           </div>
@@ -140,7 +156,7 @@ const NFTCard: React.FC<{ nft: NFT }> = ({ nft }) => {
 // ClaimNFTTab Component
 const ClaimNFTTab = () => {
   return (
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
       {nfts.map((nft) => (
         <NFTCard key={nft.id} nft={nft} />
       ))}
