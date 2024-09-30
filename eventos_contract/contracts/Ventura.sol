@@ -115,6 +115,16 @@ contract Ventura is IVentura, Ownable {
         NFT.mint(_event.creator, 1, 1, "");
     }
 
+    function mintParticipantsNFT(bytes32 _eventId) external onlyOwner {
+
+        Event memory _event = checkEvent(_eventId);
+        address[] memory _participants = _event.participants;
+
+        for (uint i = 0; i < _participants.length; i++) {
+            NFT.mint(_participants[i], 2, 1, "");
+        }
+    }
+
 
     function getEventById(bytes32 _eventId) external view returns (Event memory) {
         return checkEvent(_eventId);

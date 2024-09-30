@@ -47,9 +47,19 @@ contract VenturaTokens is ERC1155, Ownable {
         ] = "https://ipfs.io/ipfs/QmfThmmntg4dKSa8EHmbRQWUkt36fzCK54EV3BeT4Ks7hE/poap.json";
     }
 
-    function mint(address to, uint256 value, bytes memory data) external {
-        super._mint(to, counter, value, data);
-        counter++;
+    // function mint(address to, uint256 value, bytes memory data) external {
+    //     super._mint(to, counter, value, data);
+    //     counter++;
+    // }
+
+    function mint(
+        address to,
+        uint256 id,
+        uint256 value,
+        bytes memory data
+    ) external {
+        
+        super._mint(to, id, value, data);
     }
 
     function contractURI() public pure returns (string memory) {
