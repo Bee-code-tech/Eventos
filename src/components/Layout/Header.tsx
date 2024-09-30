@@ -32,7 +32,9 @@ const Header = () => {
     <header className={headerClass}>
       <div className="container flex items-center justify-between p-4 mx-auto">
         {/* Logo */}
+       <Link to='/'>
         <div className="text-2xl font-bold">Eventos</div>
+       </Link>
 
         {/* Desktop Navigation Links (hidden on mobile) */}
         <nav className="hidden space-x-6 md:flex">

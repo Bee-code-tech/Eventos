@@ -2,7 +2,19 @@ import React from "react";
 import EventCard from "../EventCard/EventCard";
 import { events } from "../../data"; // Importing the events from data.ts
 
+interface Event {
+  id: number;
+  name: string;
+  description: string;
+  date: string;
+  location: string;
+  price: number;
+  category: string;
+  image: string;
+}
+
 interface EventListProps {
+    events?: Event[];
   limit?: number;
   edit?: boolean;
   grid?: number; // Optional grid prop to customize the number of columns

@@ -25,7 +25,7 @@ export const nfts = [
   {
     id: 3,
     name: "Metaverse Expo",
-    endTimestamp: "2024-11-03T00:00:00", // Future event
+    endTimestamp: "2023-11-03T00:00:00", // Future event
     price: 0.4,
     image: nft3,
   },
