@@ -50,12 +50,14 @@ const Header = () => {
             icon={<FaCalendarAlt />}
             location={location}
           />
-          <NavLink
+          {
+            address && <NavLink
             to="/profile"
             label="Profile"
             icon={<FaUser />}
             location={location}
           />
+          }
         </nav>
 
         {/* Mobile Menu Button and Connect Wallet */}
@@ -96,12 +98,12 @@ const Header = () => {
                   icon={<FaCalendarAlt />}
                   location={location}
                 />
-                <NavLink
+               {address &&  <NavLink
                   to="/profile"
                   label="Profile"
                   icon={<FaUser />}
                   location={location}
-                />
+                />}
               </nav>
             </SheetContent>
           </Sheet>

@@ -2,27 +2,15 @@ import { useState } from "react";
 // import AllEventsTab from "./AllEventsTab";
 // import MyEventsTab from "./MyEventsTab";
 import ClaimNFTTab from "./ClaimNFTTab";
-import toast, { Toaster } from "react-hot-toast"; // React Hot Toast for notifications
-import { FaCopy } from "react-icons/fa"; // Copy icon from react-icons
+
 import EventList from "@/components/EventList/EventCard";
 import MyEventsTab from "./MyEventsTab";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 const Profile = () => {
   const [activeTab, setActiveTab] = useState<"all" | "myEvents" | "claimNFT">("all");
 
-  // Example wallet address
-  const walletAddress = "0x1234567890abcdef1234567890abcdef12345678";
 
-  // Function to copy the wallet address and show a toast
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(walletAddress);
-    toast.success("Wallet address copied!");
-  };
-
-  // Format the wallet address to show first and last 4 characters with '...'
-  const formatWalletAddress = (address: string) => {
-    return `${address.slice(0, 6)}...${address.slice(-4)}`;
-  };
 
   // Render the tab content based on activeTab state
   const renderTabContent = () => {
@@ -40,7 +28,6 @@ const Profile = () => {
 
   return (
     <div className="container min-h-screen px-4 mx-auto mt-32 mb-24">
-      <Toaster /> {/* Toast container for notifications */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-5">
         {/* Profile Section */}
         <div className="flex flex-col items-center justify-center p-6 bg-white rounded-lg shadow-md md:col-span-1 h-[300px]">
@@ -48,11 +35,9 @@ const Profile = () => {
           <div className="w-32 h-32 mb-4 rounded-full bg-gradient-to-r from-purple-400 via-pink-500 to-red-500"></div>
           {/* Wallet Address and Copy Icon */}
           <div className="flex items-center">
-            <p className="mr-2 text-lg font-semibold">{formatWalletAddress(walletAddress)}</p>
-            <FaCopy
-              className="text-gray-600 cursor-pointer hover:text-gray-800"
-              onClick={copyToClipboard}
-            />
+          <div className="mt-4">
+             <ConnectButton  />
+          </div>
           </div>
         </div>
 

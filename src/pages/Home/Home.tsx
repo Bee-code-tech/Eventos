@@ -3,8 +3,15 @@ import RetroGrid from "@/components/ui/retro-grid"; // RetroGrid animation
 import EventList from "@/components/EventList/EventCard";
 import { MarqueeDemo } from "@/components/Marquee/Marquee";
 import UpcomingEvents from "@/components/UpcomingEvent/UpcomingEvents";
+import {useAccount } from 'wagmi'
+import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { FaGlobe, FaSearch } from "react-icons/fa";
+
 
 const Home = () => {
+  const { address } = useAccount();
+  const { openConnectModal } = useConnectModal();
+  
   return (
     <div className="">
       {/* Hero Section */}
@@ -21,20 +28,36 @@ const Home = () => {
             Discover, create, and manage events effortlessly with the best event solution built just for you.
           </p>
 
+         
+
           {/* Buttons */}
           <div className="flex items-center justify-center mt-6 space-x-4">
             <Link
               to="/events"
-              className="px-6 py-3 text-white rounded-lg bg-slate-500 hover:bg-slate-500"
+              className="flex items-center justify-center px-6 py-2 text-white rounded-lg bg-slate-500 hover:bg-slate-500"
             >
+              <FaSearch className="mr-2" />
               Browse Events
             </Link>
-            <Link
+            {
+              address ? (
+                <Link
               to="/profile"
-              className="px-6 py-3 text-white rounded-lg bg-slate-900 hover:bg-gray-600"
+              className="px-6 py-2 text-white rounded-lg bg-slate-900 hover:bg-gray-600"
             >
               My Profile
             </Link>
+              ) : (
+                 <button
+              onClick={openConnectModal}
+              className="flex items-center px-4 py-2 text-white transition bg-black rounded-lg shadow-lg hover:bg-gray-800"
+            >
+              <FaGlobe className=" md:mr-2" />
+              <span className="hidden md:inline">Connect Wallet</span>{" "}
+              {/* Hide text on mobile */}
+            </button>
+              )
+             }
           </div>
         </div>
 
