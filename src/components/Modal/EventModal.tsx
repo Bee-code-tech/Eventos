@@ -1,16 +1,30 @@
-import React, { useState } from 'react';
-import { FaTrash, FaBuilding, FaUpload, FaSpinner } from 'react-icons/fa6';
-import { FaInfoCircle } from 'react-icons/fa';
+import React, { useState } from "react";
+import { FaTrash, FaBuilding, FaUpload, FaSpinner } from "react-icons/fa6";
+import { FaInfoCircle } from "react-icons/fa";
 import { CalendarIcon } from "@radix-ui/react-icons";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { uploadToPinata } from '@/utils/uploadToPinanta';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { uploadToPinata } from "@/utils/uploadToPinanta";
+import { useWriteContract } from "wagmi";
+import { ventura } from "@/constants/deployedContracts";
+import { uploadNFT } from "@/utils/uploadNFT";
+import toast from "react-hot-toast";
 
 // DatePicker component for the Event Date
-export function DatePicker({ selectedDate, onDateChange }: { selectedDate: Date | undefined, onDateChange: (date: Date | undefined) => void }) {
+export function DatePicker({
+  selectedDate,
+  onDateChange,
+}: {
+  selectedDate: Date | undefined;
+  onDateChange: (date: Date | undefined) => void;
+}) {
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -22,7 +36,11 @@ export function DatePicker({ selectedDate, onDateChange }: { selectedDate: Date 
           )}
         >
           <CalendarIcon className="w-4 h-4 mr-2" />
-          {selectedDate ? format(selectedDate, "PPP") : <span>Pick an event end date</span>}
+          {selectedDate ? (
+            format(selectedDate, "PPP")
+          ) : (
+            <span>Pick an event end date</span>
+          )}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
@@ -56,19 +74,23 @@ interface Event {
   eventDate: string;
 }
 
-const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, addEvent }) => {
-  const [title, setTitle] = useState('');
-  const [image, setImage] = useState('');
-  const [description, setDescription] = useState('');
-  const [price, setPrice] = useState('');
-  const [venue, setVenue] = useState('');
+const EventModal: React.FC<EventModalProps> = ({
+  isOpen,
+  onClose,
+  addEvent,
+}) => {
+  const [title, setTitle] = useState("");
+  const [image, setImage] = useState("");
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState("");
+  const [venue, setVenue] = useState("");
   const [eventEndDate, setEventEndDate] = useState<Date | undefined>(undefined);
-  
+  const [isCreatingEvent, setIsCreatingEvent] = useState(false);
   // Time inputs
-  const [startTime, setStartTime] = useState('');
-  const [startAmPm, setStartAmPm] = useState('AM');
-  const [endTime, setEndTime] = useState('');
-  const [endAmPm, setEndAmPm] = useState('AM');
+  const [startTime, setStartTime] = useState("");
+  const [startAmPm, setStartAmPm] = useState("AM");
+  const [endTime, setEndTime] = useState("");
+  const [endAmPm, setEndAmPm] = useState("AM");
 
   // Loading state for image upload
   const [eventImageLoading, setEventImageLoading] = useState(false);
@@ -81,68 +103,89 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, addEvent }) =>
         setImage(url); // Store the uploaded URL
       }
     } catch (error) {
-      console.error('Upload failed:', error);
+      console.error("Upload failed:", error);
     } finally {
       setEventImageLoading(false); // Hide spinner
     }
   };
+  const { writeContractAsync } = useWriteContract();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsCreatingEvent(true);
+    try {
+      if (!eventEndDate) {
+        console.error("Event end date is required");
+        toast.error("Event end date is required");
+        return;
+      }
 
-    if (!eventEndDate) {
-      console.error("Event end date is required");
-      return;
+      // Convert the eventEndDate and start/end times into full DateTime strings
+      const fullStartTime = new Date(
+        `${format(eventEndDate, "yyyy-MM-dd")} ${startTime} ${startAmPm}`
+      );
+      const fullEndTime = new Date(
+        `${format(eventEndDate, "yyyy-MM-dd")} ${endTime} ${endAmPm}`
+      );
+
+      // Convert to Unix timestamps (seconds)
+      const startUnix = Math.floor(fullStartTime.getTime() / 1000); // Start time in Unix timestamp
+      const endUnix = Math.floor(fullEndTime.getTime() / 1000); // End time in Unix timestamp
+
+      // Convert eventEndDate to Unix timestamp (just the date, no time)
+      const eventDateUnix = Math.floor(eventEndDate.getTime() / 1000); // Event date in Unix timestamp
+      const nftUri = await uploadNFT(image, title, description);
+      console.log(nftUri.data);
+      // Create newEvent object with Unix timestamps for startTime, endTime, and eventEndDate
+      const newEvent: Event = {
+        id: Date.now(),
+        title,
+        image: nftUri.data as string, // Event image URL
+        description,
+        startTime: startUnix.toString(), // Store Unix timestamp as string for smart contract
+        endTime: endUnix.toString(), // Store Unix timestamp as string for smart contract
+        venue,
+        price,
+        eventDate: eventDateUnix.toString(), // Include event end date as Unix timestamp
+      };
+      await writeContractAsync({
+        address: ventura.address as `0x${string}`,
+        abi: ventura.abi,
+        functionName: "createEvent",
+        args: [
+          newEvent.title,
+          newEvent.image,
+          newEvent.description,
+          newEvent.startTime,
+          newEvent.endTime,
+          newEvent.venue,
+          newEvent.price,
+          newEvent.eventDate,
+        ],
+      });
+
+      // Add the event to the list
+      addEvent(newEvent);
+
+      // Close the modal and clear form
+      onClose();
+      resetForm();
+      toast.success("Successfully created event");
+    } catch (error) {
+      console.log(error);
     }
-
-    // Convert the eventEndDate and start/end times into full DateTime strings
-    const fullStartTime = new Date(`${format(eventEndDate, 'yyyy-MM-dd')} ${startTime} ${startAmPm}`);
-    const fullEndTime = new Date(`${format(eventEndDate, 'yyyy-MM-dd')} ${endTime} ${endAmPm}`);
-
-    // Convert to Unix timestamps (seconds)
-    const startUnix = Math.floor(fullStartTime.getTime() / 1000); // Start time in Unix timestamp
-    const endUnix = Math.floor(fullEndTime.getTime() / 1000); // End time in Unix timestamp
-
-    // Convert eventEndDate to Unix timestamp (just the date, no time)
-    const eventDateUnix = Math.floor(eventEndDate.getTime() / 1000); // Event date in Unix timestamp
-
-    // Create newEvent object with Unix timestamps for startTime, endTime, and eventEndDate
-    const newEvent: Event = {
-      id: Date.now(),
-      title,
-      image, // Event image URL
-      description,
-      startTime: startUnix.toString(), // Store Unix timestamp as string for smart contract
-      endTime: endUnix.toString(), // Store Unix timestamp as string for smart contract
-      venue,
-      price,
-      eventDate: eventDateUnix.toString(), // Include event end date as Unix timestamp
-    };
-
-    // Log values
-    console.log('Form values:', newEvent);
-    console.log('Event End Date:', eventEndDate); // Log the selected event end date
-    console.log('Event Date Unix Timestamp:', eventDateUnix); // Log the Unix timestamp for the event end date
-    console.log('Start Unix Timestamp:', startUnix); // Log the Unix timestamp for start time
-    console.log('End Unix Timestamp:', endUnix); // Log the Unix timestamp for end time
-
-    // Add the event to the list
-    addEvent(newEvent);
-
-    // Close the modal and clear form
-    onClose();
-    resetForm();
+    setIsCreatingEvent(false);
   };
 
   const resetForm = () => {
-    setTitle('');
-    setImage('');
-    setDescription('');
-    setPrice('');
-    setVenue('');
+    setTitle("");
+    setImage("");
+    setDescription("");
+    setPrice("");
+    setVenue("");
     setEventEndDate(undefined);
-    setStartTime('');
-    setEndTime('');
+    setStartTime("");
+    setEndTime("");
   };
 
   if (!isOpen) return null;
@@ -151,7 +194,7 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, addEvent }) =>
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black bg-opacity-50 backdrop-blur-md">
       <div className="bg-white py-8 px-4 rounded-lg w-[500px] lg:max-h-[800px] overflow-y-auto max-h-[680px]">
         <h2 className="mb-4 text-2xl font-bold">Create New Event</h2>
-        
+
         <blockquote className="flex items-start p-4 mb-6 bg-green-100 rounded-lg">
           <FaInfoCircle className="mr-3 text-2xl text-green-500" />
           <span className="text-sm text-green-800">
@@ -185,9 +228,13 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, addEvent }) =>
                   />
                 </label>
               ) : (
-                <img src={image} alt="Event" className="absolute object-cover w-full h-full rounded-lg" />
+                <img
+                  src={image}
+                  alt="Event"
+                  className="absolute object-cover w-full h-full rounded-lg"
+                />
               )}
-            </div>    
+            </div>
           </div>
 
           {/* Title */}
@@ -241,7 +288,10 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, addEvent }) =>
           {/* Date Picker */}
           <div className="mb-4">
             <label className="block mb-1 text-sm">Event End Date</label>
-            <DatePicker selectedDate={eventEndDate} onDateChange={setEventEndDate} />
+            <DatePicker
+              selectedDate={eventEndDate}
+              onDateChange={setEventEndDate}
+            />
           </div>
 
           {/* Time Inputs */}
@@ -301,7 +351,10 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, addEvent }) =>
 
             <div className="flex items-center justify-center gap-2 px-3 text-white bg-black rounded">
               <FaBuilding />
-              <button type="submit" className="py-2 text-white bg-black rounded">
+              <button
+                type="submit"
+                className="py-2 text-white bg-black rounded"
+              >
                 Create Event
               </button>
             </div>
