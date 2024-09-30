@@ -1,6 +1,8 @@
 import React from "react";
 import EventCard from "../EventCard/EventCard";
 import { events } from "../../data"; // Importing the events from data.ts
+import { useReadContract } from "wagmi";
+import { ventura } from "@/constants/deployedContracts";
 
 interface Event {
   id: number;
@@ -14,7 +16,7 @@ interface Event {
 }
 
 interface EventListProps {
-    events?: Event[];
+  events?: Event[];
   limit?: number;
   edit?: boolean;
   grid?: number; // Optional grid prop to customize the number of columns
@@ -23,7 +25,12 @@ interface EventListProps {
 const EventList: React.FC<EventListProps> = ({ limit, grid, edit = false }) => {
   // Limit the events displayed if the 'limit' prop is passed
   const displayedEvents = limit ? events.slice(0, limit) : events;
-
+  const { data: allEvents } = useReadContract({
+    address: ventura.address as `0x${string}`,
+    abi: ventura.abi,
+    functionName: "",
+  });
+  console.log(allEvents);
   // Default to 4 columns in large screens, unless a custom 'grid' prop is passed
   const gridClass = grid
     ? `lg:grid-cols-${grid} md:grid-cols-3`
