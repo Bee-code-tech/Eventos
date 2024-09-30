@@ -1,18 +1,27 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import EventModal from "../../components/Modal/EventModal";
 
 import { FaPlusCircle } from "react-icons/fa";
-import { events as initialEvents } from "@/data"; 
+import { events as initialEvents } from "@/data";
 import EventList from "@/components/EventList/EventCard";
+import { useAccount } from "wagmi";
+import { getAllMyNft } from "@/utils/alchemyUtils";
 
 const MyEventsTab = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [myEvents, setMyEvents] = useState(initialEvents); // State to manage the list of events
-
+  const { address } = useAccount();
   // Function to add a new event to the state
   const addEvent = (newEvent: any) => {
     setMyEvents((prevEvents) => [...prevEvents, newEvent]);
   };
+
+  useEffect(() => {
+    // Fetch all events from the blockchain
+    if (address) {
+      getAllMyNft(address as string).then((data) => console.log(data));
+    }
+  }, [address]);
 
   return (
     <div>
