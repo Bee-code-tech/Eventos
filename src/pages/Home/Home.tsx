@@ -52,8 +52,8 @@ const Home = () => {
               onClick={openConnectModal}
               className="flex items-center px-4 py-2 text-white transition bg-black rounded-lg shadow-lg hover:bg-gray-800"
             >
-              <FaGlobe className=" md:mr-2" />
-              <span className="hidden md:inline">Connect Wallet</span>{" "}
+              <FaGlobe className="mr-2 " />
+              <span className=" md:inline">Connect Wallet</span>{" "}
               {/* Hide text on mobile */}
             </button>
               )
