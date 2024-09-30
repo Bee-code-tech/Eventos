@@ -57,7 +57,7 @@ const Profile = () => {
         </div>
 
         {/* Tabs Section */}
-        <div className="p-6 bg-white rounded-lg shadow-md md:col-span-4">
+        <div className="p-6 bg-white rounded-lg md:col-span-4">
           <h1 className="mb-4 text-2xl font-bold">Dashboard</h1>
 
           {/* Tabs */}
