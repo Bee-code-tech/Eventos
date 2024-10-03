@@ -92,6 +92,10 @@ const EventModal: React.FC<EventModalProps> = ({
   const [endTime, setEndTime] = useState("");
   const [endAmPm, setEndAmPm] = useState("AM");
 
+  const check = () => {
+    console.log('checking', isCreatingEvent)
+  }
+check()
   // Loading state for image upload
   const [eventImageLoading, setEventImageLoading] = useState(false);
 
